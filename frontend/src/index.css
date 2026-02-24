@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+
+:root{
+    @apply max-w-[70vw] m-auto mt-5
+}
