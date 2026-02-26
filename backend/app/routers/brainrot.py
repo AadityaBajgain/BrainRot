@@ -20,8 +20,8 @@ OLLAMA_URL = "http://localhost:11434/api/generate"
 
 
 @router.post("/generate")
-async def test_mistral(payload: dict = None):
-    prompt = (payload,{}).get("prompt","Write a. story about mouse")
+async def test_mistral():
+    prompt = "write poem about banana"
 
     async def stream():
         try:

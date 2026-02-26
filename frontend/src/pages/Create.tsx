@@ -1,21 +1,19 @@
 "use client"
 import React,{useState, useEffect} from 'react'
-interface createRes {
-  message:String
-}
+
 const Create:React.FC = () => {
-  const [res, setRes] = useState<createRes>();
+  const [res, setRes] = useState<String>();
   const connectBackend = async()=>{
-    const response = await fetch("http://127.0.0.1:8000/create",{
-      method:"GET",
+    const response = await fetch("http://127.0.0.1:8000/generate",{
+      method:"POST",
       headers:{
-        "Content-Type":"application/json"
+        "Content-Type":"text/plain"
       }
     });
 
-    const data = await response.json()
+    const data = await response.text()
     console.log(data)
-    setRes(data.message)
+    setRes(data)
   }
 
   useEffect(()=>{
