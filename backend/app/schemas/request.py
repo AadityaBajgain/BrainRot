@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
+
 from schemas.enums import Styles
 from typing import Annotated, Optional
-
 
 class BrainrotRequest(BaseModel):
     topic: Annotated[

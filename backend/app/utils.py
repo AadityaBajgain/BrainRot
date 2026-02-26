@@ -17,6 +17,7 @@ Tone Requirements:
 - Avoid cringe, outdated memes, or excessive slang stacking.
 
 Content Requirements:
+- At least 300 words of response
 - Must be factually correct.
 - Explain the concept clearly and completely.
 - Include at least:
@@ -25,6 +26,7 @@ Content Requirements:
   • 1 why-it-matters explanation
 - Build energy as it progresses.
 - Make it memorable and replay-worthy.
+- Give examples and references from the given file
 
 Structure:
 1. Hook (1–2 punchy lines)

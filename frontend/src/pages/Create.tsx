@@ -5,12 +5,15 @@ interface ReqBody {
   subject?: string;
   chaos_score?: number;
   style: "sigma" | "delulu" | "conspiracy" | "npc";
+  file?:File
 }
 
 const Create: React.FC = () => {
   const [res, setRes] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [reqBody, setReqBody] = useState<ReqBody>({
     topic: "",
     subject: "",
@@ -54,12 +57,24 @@ const Create: React.FC = () => {
     setRes("");
 
     try {
+
+      const file = selectedFile;
+
+      const formData = new FormData()
+      formData.append("topic", reqBody.topic)
+      formData.append("subject", reqBody.subject ?? "")
+      formData.append('style', reqBody.style)
+      if (reqBody.chaos_score !== undefined){
+        formData.append("chaos_score",String(reqBody.chaos_score))
+      }
+      if(file){
+        formData.append("file",file)
+      }
+
+
       const response = await fetch("http://127.0.0.1:8000/generate", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(reqBody),
+        body: formData,
       });
 
       if (!response.ok) {
@@ -105,6 +120,29 @@ const Create: React.FC = () => {
     });
     setRes("");
     setError(null);
+    setSelectedFile(null);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    setSelectedFile(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0] ?? null;
+    setSelectedFile(file);
   };
 
   return (
@@ -150,18 +188,26 @@ const Create: React.FC = () => {
             <span className="text-xs uppercase tracking-[0.3em] text-black/50">
               Upload PDF/TXT (optional)
             </span>
-            <div className="mt-3 h-full flex flex-col gap-6 border border-dashed border-black/20 px-4 py-4 rounded-2xl">
-            <input
-              type="file"
-              name="study_file"
-              accept=".pdf,.txt"
-              className="mt-4 block w-full text-xs text-black/60 file:mr-3 file:rounded-full file:border-0 file:bg-black file:px-4 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.25em] file:text-white"
+            <div
+              className={`mt-3 flex h-full flex-col gap-6 rounded-2xl border border-dashed px-4 py-4 transition ${
+                isDragging ? "border-black/60 bg-white" : "border-black/20"
+              }`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <input
+                type="file"
+                name="study_file"
+                accept=".pdf,.txt"
+                onChange={handleFileChange}
+                className="mt-1 block w-full text-xs text-black/60 file:mr-3 file:rounded-full file:border-0 file:bg-black file:px-4 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.25em] file:text-white"
               />
               <span className="text-sm text-black">
-                Drop a file or click to upload.
+                {selectedFile ? selectedFile.name : "Drop a file or click to upload."}
               </span>
               <span className="text-xs text-black/50">Supported: .pdf, .txt</span>
-              </div>
+            </div>
           </label>
         </div>
 
