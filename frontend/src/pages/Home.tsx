@@ -13,8 +13,11 @@ const Home: React.FC = () => {
             Brainrot study material, on demand.
           </h1>
           <p className="mt-5 max-w-xl text-lg text-black/70 md:text-xl">
-            Upload a PDF or describe the topic. Get a short, memorable explanation
+            Upload a PDF or describe the topic. Get a short, memeified explanation
             instantly.
+          <span className="mt-3 block text-xs uppercase tracking-[0.3em] text-black/40">
+            Powered by a local LLM - private and offline-ready.
+          </span>
           </p>
           <div className="mt-7 flex flex-wrap gap-4">
             <Link
