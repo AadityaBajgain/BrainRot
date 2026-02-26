@@ -8,8 +8,8 @@
 body {
   font-family: "Space Grotesk", ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", sans-serif;
-  background: #f6f3ea;
-  color: #161616;
+  background: #ffffff;
+  color: #2c1010;
 }
 
 @keyframes fadeUp {
