@@ -3,6 +3,8 @@ import json
 import httpx
 from fastapi.responses import JSONResponse, StreamingResponse
 
+from utils import Prompt
+from schemas.request import BrainrotRequest
 router = APIRouter()
 
 
@@ -20,12 +22,12 @@ OLLAMA_URL = "http://localhost:11434/api/generate"
 
 
 @router.post("/generate")
-async def test_mistral():
-    prompt = "write poem about banana"
+async def test_mistral(req: BrainrotRequest):
 
     async def stream():
+        prompt = Prompt(req.topic, req.style,req.subject, req.chaos_score)
         try:
-            async with httpx.AsyncClient (timeout=60) as client:
+            async with httpx.AsyncClient(timeout=60) as client:
                 async with client.stream(
                     "POST",
                     OLLAMA_URL,
@@ -48,7 +50,7 @@ async def test_mistral():
                         if payload_line.get("done"):
                             break
         except httpx.HTTPError as exc:
-            raise HTTPException(status_code=response.status_code, detail=str(exc))
+            raise HTTPException(status_code=502, detail=str(exc)) from exc
         
     
-    return StreamingResponse(stream(),media_type='text/plain')
+    return StreamingResponse(stream(), media_type="text/plain")

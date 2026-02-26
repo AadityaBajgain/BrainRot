@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from enums import Styles
+from schemas.enums import Styles
 from typing import Annotated, Optional
 
 
@@ -21,7 +21,7 @@ class BrainrotRequest(BaseModel):
         )
     ]
     
-    brainrot_description :Annotated[
+    subject :Annotated[
         Optional[str],
         Field(
             description="describe your topic in a paragraph in less than 50 words (optional)",
