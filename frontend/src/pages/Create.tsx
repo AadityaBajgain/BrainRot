@@ -1,111 +1,111 @@
-import React, { useState, type FormEvent } from "react"
+import React, { useState, type FormEvent } from "react";
 
 interface ReqBody {
-  topic: string
-  subject?: string
-  chaos_score?: number
-  style: "sigma" | "delulu" | "conspiracy" | "npc"
+  topic: string;
+  subject?: string;
+  chaos_score?: number;
+  style: "sigma" | "delulu" | "conspiracy" | "npc";
 }
 
 const Create: React.FC = () => {
-  const [res, setRes] = useState<string>("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [res, setRes] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [reqBody, setReqBody] = useState<ReqBody>({
     topic: "",
     subject: "",
     chaos_score: undefined,
-    style: "conspiracy"
-  })
+    style: "conspiracy",
+  });
 
   const handleChange = (
     e:
       | React.ChangeEvent<HTMLInputElement>
       | React.ChangeEvent<HTMLSelectElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
+      | React.ChangeEvent<HTMLTextAreaElement>,
   ) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     if (name === "chaos_score") {
-      const num = value === "" ? undefined : Number(value)
+      const num = value === "" ? undefined : Number(value);
       setReqBody({
         ...reqBody,
-        chaos_score: Number.isNaN(num) ? undefined : num
-      })
+        chaos_score: Number.isNaN(num) ? undefined : num,
+      });
 
-      return
+      return;
     }
 
     setReqBody({
       ...reqBody,
-      [name]: value
-    })
-  }
+      [name]: value,
+    });
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setError(null)
+    e.preventDefault();
+    setError(null);
 
     if (!reqBody.topic.trim()) {
-      setError("Please add a topic to generate.")
-      return
+      setError("Please add a topic to generate.");
+      return;
     }
 
-    setIsLoading(true)
-    setRes("")
+    setIsLoading(true);
+    setRes("");
 
     try {
       const response = await fetch("http://127.0.0.1:8000/generate", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(reqBody)
-      })
+        body: JSON.stringify(reqBody),
+      });
 
       if (!response.ok) {
-        throw new Error(`Request Failed:${response.status}`)
+        throw new Error(`Request Failed:${response.status}`);
       }
 
       if (!response.body) {
-        const text = await response.text()
-        setRes(text)
-        setIsLoading(false)
-        return
+        const text = await response.text();
+        setRes(text);
+        setIsLoading(false);
+        return;
       }
 
-      const reader = response.body.getReader()
-      const decoder = new TextDecoder()
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
 
-      let done = false
+      let done = false;
 
       while (!done) {
-        const result = await reader.read()
-        done = result.done
+        const result = await reader.read();
+        done = result.done;
 
         if (result.value) {
-          const chunk = decoder.decode(result.value, { stream: true })
+          const chunk = decoder.decode(result.value, { stream: true });
 
-          setRes((prev) => (prev ?? "") + chunk)
+          setRes((prev) => (prev ?? "") + chunk);
         }
       }
     } catch (err) {
-      console.error(err)
-      setError("Something went wrong. Try again.")
+      console.error(err);
+      setError("Something went wrong. Try again.");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleReset = () => {
     setReqBody({
       topic: "",
       subject: "",
       chaos_score: undefined,
-      style: "conspiracy"
-    })
-    setRes("")
-    setError(null)
-  }
+      style: "conspiracy",
+    });
+    setRes("");
+    setError(null);
+  };
 
   return (
     <main className="flex flex-col gap-10 pb-16">
@@ -113,40 +113,57 @@ const Create: React.FC = () => {
         <h1 className="font-['Bebas_Neue'] text-4xl uppercase tracking-[0.08em] md:text-5xl">
           Create brainrot study material
         </h1>
-        <p className="mt-3 text-sm text-black/70 md:text-base">
-          Keep it short. Keep it memorable. Add a topic or a quick description,
-          then choose the vibe.
-        </p>
       </header>
+      <form onSubmit={handleSubmit} className="grid max-w-4xl gap-6">
+        <div className="grid gap-6 md:grid-cols-[1.2fr_0.8fr]">
+          <div className="grid gap-6">
+            <label className="grid gap-2 text-sm text-black/70">
+              <span className="text-xs uppercase tracking-[0.3em] text-black/50">
+                Topic
+              </span>
+              <input
+                type="text"
+                name="topic"
+                placeholder="Binary search, mitosis, French Revolution..."
+                value={reqBody.topic}
+                onChange={handleChange}
+                className="rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-sm text-black shadow-sm focus:border-black/40 focus:outline-none"
+              />
+            </label>
 
-      <form onSubmit={handleSubmit} className="grid max-w-2xl gap-6">
-        <label className="grid gap-2 text-sm text-black/70">
-          <span className="text-xs uppercase tracking-[0.3em] text-black/50">
-            Topic
-          </span>
-          <input
-            type="text"
-            name="topic"
-            placeholder="Binary search, mitosis, French Revolution..."
-            value={reqBody.topic}
-            onChange={handleChange}
-            className="rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-sm text-black shadow-sm focus:border-black/40 focus:outline-none"
-          />
-        </label>
+            <label className="grid gap-2 text-sm text-black/70">
+              <span className="text-xs uppercase tracking-[0.3em] text-black/50">
+                Description (optional)
+              </span>
+              <textarea
+                name="subject"
+                placeholder="Describe what you want explained in 1-2 sentences."
+                value={reqBody.subject}
+                onChange={handleChange}
+                rows={5}
+                className="rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-sm text-black shadow-sm focus:border-black/40 focus:outline-none"
+              />
+            </label>
+          </div>
 
-        <label className="grid gap-2 text-sm text-black/70">
-          <span className="text-xs uppercase tracking-[0.3em] text-black/50">
-            Description (optional)
-          </span>
-          <textarea
-            name="subject"
-            placeholder="Describe what you want explained in 1–2 sentences."
-            value={reqBody.subject}
-            onChange={handleChange}
-            rows={4}
-            className="rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-sm text-black shadow-sm focus:border-black/40 focus:outline-none"
-          />
-        </label>
+          <label className="flex h-full flex-col justify-between rounded-2xl bg-white/50 text-sm text-black/70">
+            <span className="text-xs uppercase tracking-[0.3em] text-black/50">
+              Upload PDF/TXT (optional)
+            </span>
+            <div className="mt-3 h-full flex flex-col gap-6 border border-dashed border-black/20 px-4 py-4 rounded-2xl">
+            <input
+              type="file"
+              name="study_file"
+              accept=".pdf,.txt"
+              className="mt-4 block w-full text-xs text-black/60 file:mr-3 file:rounded-full file:border-0 file:bg-black file:px-4 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.25em] file:text-white"
+              />
+              <span className="text-sm text-black">
+                Drop a file or click to upload.
+              </span>
+              <span className="text-xs text-black/50">Supported: .pdf, .txt</span>
+              </div>
+          </label>
+        </div>
 
         <div className="grid gap-4 md:grid-cols-2">
           <label className="grid gap-2 text-sm text-black/70">
@@ -218,7 +235,7 @@ const Create: React.FC = () => {
         </div>
       </section>
     </main>
-  )
-}
+  );
+};
 
-export default Create
+export default Create;
