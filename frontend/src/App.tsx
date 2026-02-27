@@ -11,8 +11,10 @@ const App: React.FC = () => {
   return (
     <BrowserRouter>
       <nav className="flex flex-row justify-between items-center">
-        <img src="/Brainrot.webp" alt="brain rot icon" className="w-[10rem]" fetchPriority="high"/>
-        <Link to="/create">Create</Link>
+       <Link to="/">
+          <img src="/Brainrot.webp" alt="brain rot icon" className="w-[10rem]" fetchPriority="high"/>
+       </Link>
+        <Link to="/create" className="hover:text-blue-400">Create</Link>
       </nav>
       <Routes>
         <Route path="/" element={<Home />} />

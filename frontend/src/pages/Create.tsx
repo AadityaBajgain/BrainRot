@@ -250,14 +250,14 @@ const Create: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="rounded-full bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-white disabled:opacity-60"
+            className="rounded-full bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-white disabled:opacity-60 hover:cursor-pointer"
           >
             {isLoading ? "Generating..." : "Generate"}
           </button>
           <button
             type="button"
             onClick={handleReset}
-            className="rounded-full border border-black/30 px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-black"
+            className="rounded-full border border-black/30 px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-black hover:cursor-pointer"
           >
             Reset
           </button>
