@@ -27,7 +27,7 @@ async def test_mistral(
     subject: str | None = Form(None),
     style:  Styles= Form(...),
     chaos_score : int | None = Form(None),
-    file:File | None = File(None)
+    # file:File | None = File(None)
 ):
     data = BrainrotRequest(
         topic=topic, subject=subject, style=style, chaos_score=chaos_score
@@ -39,8 +39,8 @@ async def test_mistral(
                 async with client.stream(
                     "POST",
                     OLLAMA_URL,
-                    json={"model":"mistral","prompt":prompt,"stream":True},
-                    files=file
+                    json={"model":"gpt-oss:120b-cloud","prompt":prompt,"stream":True},
+                    # files=file
                 ) as response:
                 
                     response.raise_for_status()
