@@ -2,8 +2,12 @@ from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 import json
 import httpx
 from fastapi.responses import JSONResponse, StreamingResponse
+from piper import PiperVoice
+import wave
+
+
 from schemas.enums import Styles
-from utils import Prompt
+from utils import Prompt, save_chunks_in_wav_file
 from schemas.request import BrainrotRequest
 router = APIRouter()
 
@@ -58,6 +62,7 @@ async def test_mistral(
                             yield chunk
                         if payload_line.get("done"):
                             break
+                        save_chunks_in_wav_file(chunk, "/Users/aadityabajgain/Brainrot/backend/model/en_US-lessac-medium.onnx","/Users/aadityabajgain/Brainrot/backend/voice/voice.wav")
         except httpx.HTTPError as exc:
             raise HTTPException(status_code=502, detail=str(exc)) from exc
         
