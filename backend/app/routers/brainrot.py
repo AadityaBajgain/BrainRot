@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 import json
 import httpx
-from fastapi.responses import JSONResponse, StreamingResponse, PlainTextResponse
+from fastapi.responses import JSONResponse, StreamingResponse, PlainTextResponse, FileResponse
 # from piper import PiperVoice
 # import wave
 import requests
@@ -54,7 +54,7 @@ async def get_ai_response(
     #                         continue
     #                     try:
     #                         payload_line = json.loads(line)
-    #                         print(payload_line)
+    #                         # print(payload_line)
     #                     except json.JSONDecodeError:
     #                         continue
                         
@@ -69,6 +69,8 @@ async def get_ai_response(
         
     
     # return StreamingResponse(stream(), media_type="text/plain")
+
+
     data = requests.post(
         OLLAMA_URL,
         json={"model":"gpt-oss:120b-cloud","prompt":prompt,"stream":False},
@@ -83,4 +85,8 @@ async def get_ai_response(
     
     save_response_in_wav_file( text_response,"/Users/aadityabajgain/Brainrot/backend/model/en_US-ryan-high.onnx", "/Users/aadityabajgain/Brainrot/backend/voice/voice.wav")
     
-    # return JSONResponse(text_response, status_code=data.raise_for_status())
+    return JSONResponse(text_response, status_code=data.raise_for_status())
+    
+@router.get("/audio")   
+def send_audio():
+    return FileResponse("/Users/aadityabajgain/Brainrot/backend/voice/voice.wav", media_type="audio/wav")

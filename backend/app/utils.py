@@ -1,7 +1,6 @@
 from piper import PiperVoice
-import json
 import wave
-import os
+
 def Prompt(topic, style, description, chaos_score) -> str:
     return f"""SYSTEM ROLE
 You are an educational AI narrator. Your sole job is to transform academic topics into accurate, high-energy short-form video scripts that sound like a 15–30 second viral TikTok or YouTube Shorts voiceover.
@@ -19,7 +18,7 @@ OUTPUT RULES — READ CAREFULLY
 Output ONLY the script text. Nothing else.
 Do NOT label sections. Do NOT write headings. Do NOT mention the topic name as a title.
 Do NOT add commentary, metadata, or formatting outside the script.
-Minimum 400 words.
+Minimum 200 words.
 Maximum 4 emojis total across the entire script.
 No JSON. No bullet points. No lists.
 
@@ -59,20 +58,10 @@ BEFORE WRITING, VERIFY:
  Does the script open with a hook (no topic label, no heading)?
  Is every fact accurate?
  Are all 6 content elements present and flowing as prose?
- Is the word count above 400?
+ Is the word count above 200?
  Are there 4 or fewer emojis?
  Is the output ONLY the script — nothing else?
 """
-
-
-def _load_sample_rate(model_path: str, default_rate: int = 22050) -> int:
-    config_path = f"{model_path}.json"
-    try:
-        with open(config_path, "r", encoding="utf-8") as f:
-            config = json.load(f)
-        return int(config["audio"]["sample_rate"])
-    except (OSError, KeyError, TypeError, ValueError):
-        return default_rate
 
 
 def save_response_in_wav_file(text_response: str, model_path:str, wav_file_path:str):

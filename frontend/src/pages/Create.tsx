@@ -5,7 +5,7 @@ interface ReqBody {
   subject?: string;
   chaos_score?: number;
   style: "sigma" | "delulu" | "conspiracy" | "npc";
-  file?:File
+  file?: File;
 }
 
 const Create: React.FC = () => {
@@ -14,6 +14,7 @@ const Create: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [audioSrc, setAudioSrc] = useState<string>();
   const [reqBody, setReqBody] = useState<ReqBody>({
     topic: "",
     subject: "",
@@ -57,20 +58,18 @@ const Create: React.FC = () => {
     setRes("");
 
     try {
-
       const file = selectedFile;
 
-      const formData = new FormData()
-      formData.append("topic", reqBody.topic)
-      formData.append("subject", reqBody.subject ?? "")
-      formData.append('style', reqBody.style)
-      if (reqBody.chaos_score !== undefined){
-        formData.append("chaos_score",String(reqBody.chaos_score))
+      const formData = new FormData();
+      formData.append("topic", reqBody.topic);
+      formData.append("subject", reqBody.subject ?? "");
+      formData.append("style", reqBody.style);
+      if (reqBody.chaos_score !== undefined) {
+        formData.append("chaos_score", String(reqBody.chaos_score));
       }
-      if(file){
-        formData.append("file",file)
+      if (file) {
+        formData.append("file", file);
       }
-
 
       const response = await fetch("http://127.0.0.1:8000/generate", {
         method: "POST",
@@ -111,6 +110,26 @@ const Create: React.FC = () => {
     }
   };
 
+  const getAudio = async () => {
+    const audioResponse = await fetch("http://127.0.0.1:8000/audio", {
+      method: "GET",
+    });
+
+    if(!audioResponse.ok){
+      throw new Error(`Audio Request Failed: ${audioResponse.status}`)
+    }
+    const blob = await audioResponse.blob();
+    const url = URL.createObjectURL(blob);
+
+    return url;
+    
+  };
+
+  const load_audio = async ()=>{
+    const audio = await getAudio();
+    setAudioSrc(audio);
+
+  }
   const handleReset = () => {
     setReqBody({
       topic: "",
@@ -146,124 +165,139 @@ const Create: React.FC = () => {
   };
 
   return (
-    <main className="flex flex-col gap-10 pb-16">
+    <main className="max-w-[90vw] flex flex-col gap-10 pb-16 mx-auto">
       <header className="max-w-2xl">
         <h1 className="font-['Bebas_Neue'] text-4xl uppercase tracking-[0.08em] md:text-5xl">
           Create brainrot study material
         </h1>
       </header>
-      <form onSubmit={handleSubmit} className="grid max-w-4xl gap-6">
-        <div className="grid gap-6 md:grid-cols-[1.2fr_0.8fr]">
-          <div className="grid gap-6">
+      <div className="flex flex-col md:flex-row gap-5">
+        <form onSubmit={handleSubmit} className="grid max-w-4xl gap-6">
+          <div className="grid gap-6 md:grid-cols-[1.2fr_0.8fr]">
+            <div className="grid gap-6">
+              <label className="grid gap-2 text-sm text-black/70">
+                <span className="text-xs uppercase tracking-[0.3em] text-black/50">
+                  Topic
+                </span>
+                <input
+                  type="text"
+                  name="topic"
+                  placeholder="Binary search, mitosis, French Revolution..."
+                  value={reqBody.topic}
+                  onChange={handleChange}
+                  className="rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-sm text-black shadow-sm focus:border-black/40 focus:outline-none"
+                />
+              </label>
+
+              <label className="grid gap-2 text-sm text-black/70">
+                <span className="text-xs uppercase tracking-[0.3em] text-black/50">
+                  Description (optional)
+                </span>
+                <textarea
+                  name="subject"
+                  placeholder="Describe what you want explained in 1-2 sentences."
+                  value={reqBody.subject}
+                  onChange={handleChange}
+                  rows={5}
+                  className="rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-sm text-black shadow-sm focus:border-black/40 focus:outline-none"
+                />
+              </label>
+            </div>
+
+            <label className="flex h-full flex-col justify-between rounded-2xl bg-white/50 text-sm text-black/70">
+              <span className="text-xs uppercase tracking-[0.3em] text-black/50">
+                Upload PDF/TXT (optional)
+              </span>
+              <div
+                className={`mt-3 flex h-full flex-col gap-6 rounded-2xl border border-dashed px-4 py-4 transition ${
+                  isDragging ? "border-black/60 bg-white" : "border-black/20"
+                }`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
+                <input
+                  type="file"
+                  name="study_file"
+                  accept=".pdf,.txt"
+                  onChange={handleFileChange}
+                  className="mt-1 block w-full text-xs text-black/60 file:mr-3 file:rounded-full file:border-0 file:bg-black file:px-4 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.25em] file:text-white"
+                />
+                <span className="text-sm text-black">
+                  {selectedFile
+                    ? selectedFile.name
+                    : "Drop a file or click to upload."}
+                </span>
+                <span className="text-xs text-black/50">
+                  Supported: .pdf, .txt
+                </span>
+              </div>
+            </label>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
             <label className="grid gap-2 text-sm text-black/70">
               <span className="text-xs uppercase tracking-[0.3em] text-black/50">
-                Topic
+                Style
               </span>
-              <input
-                type="text"
-                name="topic"
-                placeholder="Binary search, mitosis, French Revolution..."
-                value={reqBody.topic}
+              <select
+                name="style"
+                value={reqBody.style}
                 onChange={handleChange}
                 className="rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-sm text-black shadow-sm focus:border-black/40 focus:outline-none"
-              />
+              >
+                <option value="sigma">Sigma</option>
+                <option value="delulu">Delulu</option>
+                <option value="conspiracy">Conspiracy</option>
+                <option value="npc">NPC</option>
+              </select>
             </label>
 
             <label className="grid gap-2 text-sm text-black/70">
               <span className="text-xs uppercase tracking-[0.3em] text-black/50">
-                Description (optional)
+                Chaos Score (1-100)
               </span>
-              <textarea
-                name="subject"
-                placeholder="Describe what you want explained in 1-2 sentences."
-                value={reqBody.subject}
+              <input
+                type="number"
+                name="chaos_score"
+                placeholder="Auto"
+                min={1}
+                max={100}
+                value={reqBody.chaos_score ?? ""}
                 onChange={handleChange}
-                rows={5}
                 className="rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-sm text-black shadow-sm focus:border-black/40 focus:outline-none"
               />
             </label>
           </div>
 
-          <label className="flex h-full flex-col justify-between rounded-2xl bg-white/50 text-sm text-black/70">
-            <span className="text-xs uppercase tracking-[0.3em] text-black/50">
-              Upload PDF/TXT (optional)
-            </span>
-            <div
-              className={`mt-3 flex h-full flex-col gap-6 rounded-2xl border border-dashed px-4 py-4 transition ${
-                isDragging ? "border-black/60 bg-white" : "border-black/20"
-              }`}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="rounded-full bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-white disabled:opacity-60 hover:cursor-pointer"
             >
-              <input
-                type="file"
-                name="study_file"
-                accept=".pdf,.txt"
-                onChange={handleFileChange}
-                className="mt-1 block w-full text-xs text-black/60 file:mr-3 file:rounded-full file:border-0 file:bg-black file:px-4 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.25em] file:text-white"
-              />
-              <span className="text-sm text-black">
-                {selectedFile ? selectedFile.name : "Drop a file or click to upload."}
-              </span>
-              <span className="text-xs text-black/50">Supported: .pdf, .txt</span>
-            </div>
-          </label>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="grid gap-2 text-sm text-black/70">
-            <span className="text-xs uppercase tracking-[0.3em] text-black/50">
-              Style
-            </span>
-            <select
-              name="style"
-              value={reqBody.style}
-              onChange={handleChange}
-              className="rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-sm text-black shadow-sm focus:border-black/40 focus:outline-none"
+              {isLoading ? "Generating..." : "Generate"}
+            </button>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="rounded-full border border-black/30 px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-black hover:cursor-pointer"
             >
-              <option value="sigma">Sigma</option>
-              <option value="delulu">Delulu</option>
-              <option value="conspiracy">Conspiracy</option>
-              <option value="npc">NPC</option>
-            </select>
-          </label>
-
-          <label className="grid gap-2 text-sm text-black/70">
-            <span className="text-xs uppercase tracking-[0.3em] text-black/50">
-              Chaos Score (1-100)
-            </span>
-            <input
-              type="number"
-              name="chaos_score"
-              placeholder="Auto"
-              min={1}
-              max={100}
-              value={reqBody.chaos_score ?? ""}
-              onChange={handleChange}
-              className="rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-sm text-black shadow-sm focus:border-black/40 focus:outline-none"
-            />
-          </label>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="rounded-full bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-white disabled:opacity-60 hover:cursor-pointer"
-          >
-            {isLoading ? "Generating..." : "Generate"}
+              Reset
+            </button>
+            {error && <p className="text-sm text-red-600">{error}</p>}
+          </div>
+        </form>
+        <div className="flex flex-col items-center justify-center gap-10 w-[20vw] border-2 border-slate-300 rounded-2xl h-[40vh]md:h-full">
+          <button onClick={load_audio} 
+          className="rounded-full bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-white disabled:opacity-60 hover:cursor-pointer">
+            Load Audio
           </button>
-          <button
-            type="button"
-            onClick={handleReset}
-            className="rounded-full border border-black/30 px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-black hover:cursor-pointer"
-          >
-            Reset
-          </button>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {
+            audioSrc ? <audio src={audioSrc} controls className="w-[80%] h-[2rem]"></audio>:"No src"
+          }
         </div>
-      </form>
+      </div>
 
       <section className="max-w-2xl">
         <div className="flex items-center justify-between">
