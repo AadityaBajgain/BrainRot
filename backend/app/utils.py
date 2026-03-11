@@ -1,7 +1,7 @@
 from piper import PiperVoice
 import json
 import wave
-
+import os
 def Prompt(topic, style, description, chaos_score) -> str:
     return f"""SYSTEM ROLE
 You are an educational AI narrator. Your sole job is to transform academic topics into accurate, high-energy short-form video scripts that sound like a 15–30 second viral TikTok or YouTube Shorts voiceover.
@@ -75,16 +75,10 @@ def _load_sample_rate(model_path: str, default_rate: int = 22050) -> int:
         return default_rate
 
 
-def save_chunks_in_wav_file(chunk, model_path, wav_file_path):
-    if not chunk:
-        return
+def save_response_in_wav_file(text_response: str, model_path:str, wav_file_path:str):
     voice = PiperVoice.load(model_path)
-    sample_rate = _load_sample_rate(model_path)
     with wave.open(wav_file_path, "wb") as v:
-        v.setnchannels(1)
-        v.setsampwidth(2)  # 16-bit PCM = 2 bytes
-        v.setframerate(sample_rate)
-        voice.synthesize_wav(chunk, v)
+        voice.synthesize_wav(text_response, v)
     
 
 def generate_voice(model_path):

@@ -8,7 +8,7 @@ from routers import brainrot
 app = FastAPI()
 load_dotenv()
 
-origins = [os.getenv("origin")]
+origins = os.getenv("origin")
 
 app.add_middleware(
     CORSMiddleware,
