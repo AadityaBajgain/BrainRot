@@ -1,4 +1,4 @@
-import React, { useState, type FormEvent } from "react";
+import React, { useEffect, useState, type FormEvent } from "react";
 
 interface ReqBody {
   topic: string;
@@ -79,32 +79,39 @@ const Create: React.FC = () => {
       if (!response.ok) {
         throw new Error(`Request Failed:${response.status}`);
       }
-
-      if (!response.body) {
-        const text = await response.text();
-        setRes(text);
+      else{
+        const data = await response.json();
+        console.log(data);
+        setRes(data.response);
         setIsLoading(false);
         return;
       }
+      // if (!response.body) {
+      //   const data = await response.json();
+      //   console.log(data)
+      //   setRes(data.response);
+      //   setIsLoading(false);
+      //   return;
+      // }
 
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
+      // const reader = response.body.getReader();
+      // const decoder = new TextDecoder();
 
-      let done = false;
+      // let done = false;
 
-      while (!done) {
-        const result = await reader.read();
-        done = result.done;
+      // while (!done) {
+      //   const result = await reader.read();
+      //   done = result.done;
 
-        if (result.value) {
-          const chunk = decoder.decode(result.value, { stream: true });
+      //   if (result.value) {
+      //     const chunk = decoder.decode(result.value, { stream: true });
 
-          setRes((prev) => (prev ?? "") + chunk);
-        }
-      }
+      //     setRes((prev) => (prev ?? "") + chunk);
+      //   }
+      // }
     } catch (err) {
       console.error(err);
-      setError("Something went wrong. Try again.");
+      setError(`Error: ${err}`);
     } finally {
       setIsLoading(false);
     }
@@ -163,6 +170,11 @@ const Create: React.FC = () => {
     const file = e.dataTransfer.files?.[0] ?? null;
     setSelectedFile(file);
   };
+
+
+  useEffect(()=>{
+    load_audio();
+  },[res])
 
   return (
     <main className="max-w-[90vw] flex flex-col gap-10 pb-16 mx-auto">
@@ -288,7 +300,7 @@ const Create: React.FC = () => {
             {error && <p className="text-sm text-red-600">{error}</p>}
           </div>
         </form>
-        <div className="flex flex-col items-center justify-center gap-10 w-[20vw] border-2 border-slate-300 rounded-2xl h-[40vh]md:h-full">
+        <div className="w-full flex flex-col items-center justify-center gap-10 border-2 border-slate-300 rounded-2xl h-[50vh] md:w-[20vw]">
           <button onClick={load_audio} 
           className="rounded-full bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-white disabled:opacity-60 hover:cursor-pointer">
             Load Audio

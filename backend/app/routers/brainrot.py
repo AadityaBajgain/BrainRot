@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, Form
 import json
 import httpx
 from fastapi.responses import JSONResponse, StreamingResponse, PlainTextResponse, FileResponse
@@ -85,7 +85,7 @@ async def get_ai_response(
     
     save_response_in_wav_file( text_response,"/Users/aadityabajgain/Brainrot/backend/model/en_US-ryan-high.onnx", "/Users/aadityabajgain/Brainrot/backend/voice/voice.wav")
     
-    return JSONResponse(text_response, status_code=data.raise_for_status())
+    return JSONResponse(data.json(), status_code=data.status_code)
     
 @router.get("/audio")   
 def send_audio():
