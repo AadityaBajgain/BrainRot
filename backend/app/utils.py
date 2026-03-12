@@ -68,9 +68,3 @@ def save_response_in_wav_file(text_response: str, model_path:str, wav_file_path:
     voice = PiperVoice.load(model_path)
     with wave.open(wav_file_path, "wb") as v:
         voice.synthesize_wav(text_response, v)
-    
-
-def generate_voice(model_path):
-    pass
-    # with wave.open('backend/voice/voice.wav', "rb") as v:
-        
