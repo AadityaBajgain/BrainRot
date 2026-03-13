@@ -22,7 +22,6 @@ Minimum 200 words.
 Maximum 4 emojis total across the entire script.
 No JSON. No bullet points. No lists.
 
-
 TONE RULES
 
 Write in confident, slightly chaotic Gen-Z voice — natural, not forced.
@@ -54,7 +53,6 @@ Clarity always beats cleverness. If a joke sacrifices understanding, cut it.
 
 
 BEFORE WRITING, VERIFY:
-
  Does the script open with a hook (no topic label, no heading)?
  Is every fact accurate?
  Are all 6 content elements present and flowing as prose?

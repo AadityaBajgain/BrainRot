@@ -129,13 +129,11 @@ const Create: React.FC = () => {
     const url = URL.createObjectURL(blob);
 
     return url;
-    
   };
 
   const load_audio = async ()=>{
     const audio = await getAudio();
     setAudioSrc(audio);
-
   }
   const handleReset = () => {
     setReqBody({
@@ -173,7 +171,7 @@ const Create: React.FC = () => {
 
 
   useEffect(()=>{
-    load_audio();
+    getAudio();
   },[res])
 
   return (
