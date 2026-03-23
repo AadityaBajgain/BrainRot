@@ -78,8 +78,7 @@ const Create: React.FC = () => {
 
       if (!response.ok) {
         throw new Error(`Request Failed:${response.status}`);
-      }
-      else{
+      } else {
         const data = await response.json();
         console.log(data);
         setRes(data.response);
@@ -122,8 +121,8 @@ const Create: React.FC = () => {
       method: "GET",
     });
 
-    if(!audioResponse.ok){
-      throw new Error(`Audio Request Failed: ${audioResponse.status}`)
+    if (!audioResponse.ok) {
+      throw new Error(`Audio Request Failed: ${audioResponse.status}`);
     }
     const blob = await audioResponse.blob();
     const url = URL.createObjectURL(blob);
@@ -131,10 +130,10 @@ const Create: React.FC = () => {
     return url;
   };
 
-  const load_audio = async ()=>{
+  const load_audio = async () => {
     const audio = await getAudio();
     setAudioSrc(audio);
-  }
+  };
   const handleReset = () => {
     setReqBody({
       topic: "",
@@ -169,8 +168,6 @@ const Create: React.FC = () => {
     setSelectedFile(file);
   };
 
-
-
   return (
     <main className="max-w-[90vw] flex flex-col gap-10 pb-16 mx-auto">
       <header className="max-w-2xl">
@@ -178,7 +175,7 @@ const Create: React.FC = () => {
           Create brainrot study material
         </h1>
       </header>
-      <div className="flex flex-col md:flex-row gap-5">
+      <div className="flex flex-col justify-between md:flex-row gap-5">
         <form onSubmit={handleSubmit} className="grid max-w-4xl gap-6">
           <div className="grid gap-6 md:grid-cols-[1.2fr_0.8fr]">
             <div className="grid gap-6">
@@ -295,32 +292,39 @@ const Create: React.FC = () => {
             {error && <p className="text-sm text-red-600">{error}</p>}
           </div>
         </form>
-        <div className="w-full flex flex-col items-center justify-center gap-10 border-2 border-slate-300 rounded-2xl h-[50vh] md:w-[20vw]">
-          <button onClick={load_audio} 
-          className="rounded-full bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-white disabled:opacity-60 hover:cursor-pointer">
-            Load Audio
-          </button>
-          {
-            audioSrc ? <audio src={audioSrc} controls className="w-[80%] h-8"></audio>:"No src"
-          }
-        </div>
+        {
+          audioSrc ? 
+          <div className="w-fit flex flex-col items-center justify-center gap-10 border-2 border-slate-300 rounded-2xl h-fit md:w-[20vw]">
+            <button
+              onClick={load_audio}
+              className="rounded-full bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-white disabled:opacity-60 hover:cursor-pointer"
+            >
+              Load Audio
+            </button> 
+              <audio src={audioSrc} controls className="w-[80%] h-8"></audio>
+          </div>
+          :
+          <div className="w-[50vw] h-[70vh] text-center mx-auto flex flex-col items-center justify-center gap-10 border-2 border-slate-300 rounded-2xl md:w-[20vw] md:h-[50vh]">
+            <p>Created Video Will Be Shown Here</p>
+          </div>
+        }
       </div>
 
-      <section className="max-w-2xl">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xs uppercase tracking-[0.3em] text-black/50">
-            Output
-          </h2>
-          {isLoading && (
-            <span className="text-xs uppercase tracking-[0.3em] text-black/40">
-              Streaming
-            </span>
-          )}
-        </div>
-        <div className="mt-3 min-h-[160px] rounded-2xl border border-black/10 bg-white/60 p-4 text-sm text-black/80">
-          {res || "Your brainrot summary will appear here."}
-        </div>
-      </section>
+      {/* <section className="max-w-2xl">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xs uppercase tracking-[0.3em] text-black/50">
+              Output
+            </h2>
+            {isLoading && (
+              <span className="text-xs uppercase tracking-[0.3em] text-black/40">
+                Streaming
+              </span>
+            )}
+          </div>
+          <div className="mt-3 min-h-[160px] rounded-2xl border border-black/10 bg-white/60 p-4 text-sm text-black/80">
+            {res || "Your brainrot summary will appear here."}
+          </div>
+        </section> */}
     </main>
   );
 };
