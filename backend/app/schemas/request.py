@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field
-
 from schemas.enums import Styles
 from typing import Annotated, Optional
 
@@ -37,5 +36,14 @@ class BrainrotRequest(BaseModel):
             examples=[100, 5, 49],
             ge=1,
             le=100
+        )
+        
+    ]
+    
+    file: Annotated[
+        Optional[str],
+        Field(
+            description="Upload file from where you want to generate the content",
+            examples=["MyContent.pdf"],
         )
     ]

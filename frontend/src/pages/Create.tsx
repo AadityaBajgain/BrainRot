@@ -170,9 +170,6 @@ const Create: React.FC = () => {
   };
 
 
-  useEffect(()=>{
-    getAudio();
-  },[res])
 
   return (
     <main className="max-w-[90vw] flex flex-col gap-10 pb-16 mx-auto">
@@ -304,7 +301,7 @@ const Create: React.FC = () => {
             Load Audio
           </button>
           {
-            audioSrc ? <audio src={audioSrc} controls className="w-[80%] h-[2rem]"></audio>:"No src"
+            audioSrc ? <audio src={audioSrc} controls className="w-[80%] h-8"></audio>:"No src"
           }
         </div>
       </div>

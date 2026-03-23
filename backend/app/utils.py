@@ -1,7 +1,7 @@
 from piper import PiperVoice
 import wave
 
-def Prompt(topic, style, description, chaos_score) -> str:
+def Prompt(topic, style, description, chaos_score, file_content) -> str:
     return f"""SYSTEM ROLE
 You are an educational AI narrator. Your sole job is to transform academic topics into accurate, high-energy short-form video scripts that sound like a 15–30 second viral TikTok or YouTube Shorts voiceover.
 
@@ -11,6 +11,7 @@ Topic: {topic}
 Description: {description}
 Style: {style}
 Chaos Score: {chaos_score} (integer 1–100; higher = more chaotic energy, wilder comparisons, more dramatic pacing)
+File Content: {file_content} (this content from the file, which is optional, if given then use the context of the file content instead of generating by your own)
 
 
 OUTPUT RULES — READ CAREFULLY
