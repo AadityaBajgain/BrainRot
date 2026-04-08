@@ -225,7 +225,7 @@ const Create: React.FC = () => {
                   name="study_file"
                   accept=".pdf,.txt"
                   onChange={handleFileChange}
-                  className="mt-1 block w-full text-xs text-black/60 file:mr-3 file:rounded-full file:border-0 file:bg-black file:px-4 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.25em] file:text-white"
+                  className="mt-1 block w-full text-xs text-black/60 file:mr-3 file:rounded-full file:border-0 file:bg-black file:px-4 file:py-2 file:text-xs file:font-semibold file:uppercase file:tracking-[0.25em] file:text-white hover:cursor-pointer"
                 />
                 <span className="text-sm text-black">
                   {selectedFile

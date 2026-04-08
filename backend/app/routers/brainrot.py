@@ -2,7 +2,7 @@ from fastapi import APIRouter, UploadFile, Form, HTTPException
 # import json
 # import httpx
 import io
-from fastapi.responses import JSONResponse, StreamingResponse, PlainTextResponse, FileResponse
+from fastapi.responses import JSONResponse, FileResponse
 # from piper import PiperVoice
 # import wave
 import requests
@@ -86,8 +86,7 @@ async def get_ai_response(
         #                 OLLAMA_URL,
         #                 json={"model":"gpt-oss:120b-cloud","prompt":prompt,"stream":True},
         #                 # files=file
-        #             ) as response:
-                    
+        #             ) as response:           
         #                 async for line in response.aiter_lines():
         #                     if not line:
         #                         continue
@@ -105,8 +104,6 @@ async def get_ai_response(
         #                     # save_chunks_in_wav_file(chunk, "/Users/aadityabajgain/Brainrot/backend/model/en_US-ryan-high.onnx","/Users/aadityabajgain/Brainrot/backend/voice/voice.wav")
         #     except httpx.HTTPError as exc:
         #         raise HTTPException(status_code=502, detail=str(exc)) from exc
-            
-        
         # return StreamingResponse(stream(), media_type="text/plain")
 
 
