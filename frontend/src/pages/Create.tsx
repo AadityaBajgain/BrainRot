@@ -1,4 +1,4 @@
-import React, { useEffect, useState, type FormEvent } from "react";
+import React, { useState, type FormEvent } from "react";
 
 interface ReqBody {
   topic: string;
@@ -14,7 +14,7 @@ const Create: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const [audioSrc, setAudioSrc] = useState<string>();
+  const [audioSrc, setAudioSrc] = useState<string>("");
   const [reqBody, setReqBody] = useState<ReqBody>({
     topic: "",
     subject: "",
@@ -77,37 +77,12 @@ const Create: React.FC = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`Request Failed:${response.status}`);
-      } else {
-        const data = await response.json();
-        console.log(data);
-        setRes(data.response);
-        setIsLoading(false);
-        return;
+        throw new Error(`Request Failed: ${response.status}`);
       }
-      // if (!response.body) {
-      //   const data = await response.json();
-      //   console.log(data)
-      //   setRes(data.response);
-      //   setIsLoading(false);
-      //   return;
-      // }
 
-      // const reader = response.body.getReader();
-      // const decoder = new TextDecoder();
-
-      // let done = false;
-
-      // while (!done) {
-      //   const result = await reader.read();
-      //   done = result.done;
-
-      //   if (result.value) {
-      //     const chunk = decoder.decode(result.value, { stream: true });
-
-      //     setRes((prev) => (prev ?? "") + chunk);
-      //   }
-      // }
+      const data = await response.json();
+      setRes(data.response ?? "");
+      setAudioSrc(data.audio_url ?? "");
     } catch (err) {
       console.error(err);
       setError(`Error: ${err}`);
@@ -116,24 +91,6 @@ const Create: React.FC = () => {
     }
   };
 
-  const getAudio = async () => {
-    const audioResponse = await fetch("http://127.0.0.1:8000/audio", {
-      method: "GET",
-    });
-
-    if (!audioResponse.ok) {
-      throw new Error(`Audio Request Failed: ${audioResponse.status}`);
-    }
-    const blob = await audioResponse.blob();
-    const url = URL.createObjectURL(blob);
-
-    return url;
-  };
-
-  const load_audio = async () => {
-    const audio = await getAudio();
-    setAudioSrc(audio);
-  };
   const handleReset = () => {
     setReqBody({
       topic: "",
@@ -144,6 +101,7 @@ const Create: React.FC = () => {
     setRes("");
     setError(null);
     setSelectedFile(null);
+    setAudioSrc("");
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -292,39 +250,29 @@ const Create: React.FC = () => {
             {error && <p className="text-sm text-red-600">{error}</p>}
           </div>
         </form>
-        {
-          audioSrc ? 
-          <div className="w-fit flex flex-col items-center justify-center gap-10 border-2 border-slate-300 rounded-2xl h-fit md:w-[20vw]">
-            <button
-              onClick={load_audio}
-              className="rounded-full bg-black px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em] text-white disabled:opacity-60 hover:cursor-pointer"
-            >
-              Load Audio
-            </button> 
-              <audio src={audioSrc} controls className="w-[80%] h-8"></audio>
+        <div className="w-full max-w-md rounded-2xl border border-slate-300 bg-white/60 p-6 shadow-sm">
+          <div className="flex flex-col gap-4">
+            <p className="text-xs uppercase tracking-[0.3em] text-black/50">
+              Generated Output
+            </p>
+            <div className="max-h-64 overflow-auto rounded-2xl border border-black/10 bg-white p-4 text-sm text-black/80">
+              {res || "Your brainrot summary will appear here."}
+            </div>
+            <div className="rounded-2xl border border-black/10 bg-white p-4">
+              <p className="mb-3 text-xs uppercase tracking-[0.3em] text-black/50">
+                Audio Preview
+              </p>
+              {audioSrc ? (
+                <audio src={audioSrc} controls className="w-full" />
+              ) : (
+                <p className="text-sm text-black/50">
+                  Generate content to load the voiceover.
+                </p>
+              )}
+            </div>
           </div>
-          :
-          <div className="w-[50vw] h-[70vh] text-center mx-auto flex flex-col items-center justify-center gap-10 border-2 border-slate-300 rounded-2xl md:w-[20vw] md:h-[50vh]">
-            <p>Created Video Will Be Shown Here</p>
-          </div>
-        }
+        </div>
       </div>
-
-      {/* <section className="max-w-2xl">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xs uppercase tracking-[0.3em] text-black/50">
-              Output
-            </h2>
-            {isLoading && (
-              <span className="text-xs uppercase tracking-[0.3em] text-black/40">
-                Streaming
-              </span>
-            )}
-          </div>
-          <div className="mt-3 min-h-[160px] rounded-2xl border border-black/10 bg-white/60 p-4 text-sm text-black/80">
-            {res || "Your brainrot summary will appear here."}
-          </div>
-        </section> */}
     </main>
   );
 };

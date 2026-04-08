@@ -1,5 +1,7 @@
-from piper import PiperVoice
+from pathlib import Path
 import wave
+
+from piper import PiperVoice
 
 def Prompt(topic, style, description, chaos_score, file_content) -> str:
     return f"""SYSTEM ROLE
@@ -63,7 +65,10 @@ BEFORE WRITING, VERIFY:
 """
 
 
-def save_response_in_wav_file(text_response: str, model_path:str, wav_file_path:str):
+def save_response_in_wav_file(text_response: str, model_path: str, wav_file_path: str):
+    output_path = Path(wav_file_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
     voice = PiperVoice.load(model_path)
-    with wave.open(wav_file_path, "wb") as v:
+    with wave.open(str(output_path), "wb") as v:
         voice.synthesize_wav(text_response, v)
