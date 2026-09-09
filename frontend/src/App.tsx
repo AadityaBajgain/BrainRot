@@ -14,7 +14,6 @@ const App: React.FC = () => {
        <Link to="/">
           <img src="/Brainrot.webp" alt="brain rot icon" className="w-[10rem]" fetchPriority="high"/>
        </Link>
-        <Link to="/create" className="rounded-full border border-black/15 px-4 py-2 text-sm font-semibold transition hover:border-black hover:bg-black hover:text-white">Create</Link>
       </nav>
       <Routes>
         <Route path="/" element={<Home />} />
