@@ -1,4 +1,4 @@
-import React, { useState, type FormEvent } from "react";
+import React, { useEffect, useRef, useState, type FormEvent } from "react";
 
 interface ReqBody {
   topic: string;
@@ -10,6 +10,60 @@ interface ReqBody {
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000").replace(/\/$/, "");
 
+const BRAINROT_CLIPS = [
+  {
+    id: "slime",
+    title: "Slime Scoop",
+    description: "Oddly satisfying, bright, and impossible to ignore.",
+    src: "/clips/slime.mp4",
+    sourceUrl: "https://mixkit.co/free-stock-video/slippery-slime-in-the-hands-of-a-woman-who-plays-47343/",
+  },
+  {
+    id: "plasticine",
+    title: "Plasticine Loop",
+    description: "Soft, colorful motion for a calmer background.",
+    src: "/clips/plasticine.mp4",
+    sourceUrl: "https://mixkit.co/free-stock-video/showing-yellow-plasticine-in-the-shape-of-ice-cream-48181/",
+  },
+  {
+    id: "dominoes",
+    title: "Domino Chain",
+    description: "A quick cause-and-effect visual with real momentum.",
+    src: "/clips/dominoes.mp4",
+    sourceUrl: "https://mixkit.co/free-stock-video/domino-effect-on-dark-background-5253/",
+  },
+  {
+    id: "neon-bokeh",
+    title: "Neon Bokeh",
+    description: "High-energy color without distracting from the voiceover.",
+    src: "/clips/neon-bokeh.mp4",
+    sourceUrl: "https://mixkit.co/free-stock-video/vertical-video-of-colorful-bokeh-lights-on-black-background-99842/",
+  },
+  {
+    id: "brain-spiral",
+    title: "Brain Spiral",
+    description: "The full chaotic-study-mode option.",
+    src: "/clips/brain-spiral.mp4",
+    sourceUrl: "https://mixkit.co/free-stock-video/dynamic-animation-of-the-head-of-a-screaming-man-32645/",
+  },
+  {
+    id:"TungTung",
+    title:"Tung Tung Sahur",
+    description:"...",
+    src:"/clips/TungTung.mp4",
+  }
+] as const;
+
+type ClipId = (typeof BRAINROT_CLIPS)[number]["id"] | "custom";
+
+type SelectedClip = {
+  id: ClipId;
+  title: string;
+  description: string;
+  src: string;
+  sourceUrl?: string;
+};
+
 const Create: React.FC = () => {
   const [res, setRes] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
@@ -17,6 +71,12 @@ const Create: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [audioSrc, setAudioSrc] = useState<string>("");
+  const [selectedClipId, setSelectedClipId] = useState<ClipId>("slime");
+  const [customClipFile, setCustomClipFile] = useState<File | null>(null);
+  const [customClipUrl, setCustomClipUrl] = useState<string | null>(null);
+  const [isNarratedPreviewPlaying, setIsNarratedPreviewPlaying] = useState(false);
+  const previewVideoRef = useRef<HTMLVideoElement>(null);
+  const previewAudioRef = useRef<HTMLAudioElement>(null);
   const [reqBody, setReqBody] = useState<ReqBody>({
     topic: "",
     subject: "",
@@ -106,6 +166,71 @@ const Create: React.FC = () => {
     setError(null);
     setSelectedFile(null);
     setAudioSrc("");
+    setIsNarratedPreviewPlaying(false);
+    setSelectedClipId("slime");
+    setCustomClipFile(null);
+    setCustomClipUrl(null);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (customClipUrl) URL.revokeObjectURL(customClipUrl);
+    };
+  }, [customClipUrl]);
+
+  const selectedClip: SelectedClip = selectedClipId === "custom" && customClipFile && customClipUrl
+    ? {
+        id: "custom",
+        title: customClipFile.name,
+        description: "Your uploaded background clip.",
+        src: customClipUrl,
+      }
+    : BRAINROT_CLIPS.find((clip) => clip.id === selectedClipId) ?? BRAINROT_CLIPS[0];
+
+  const selectClip = (clipId: ClipId) => {
+    previewVideoRef.current?.pause();
+    previewAudioRef.current?.pause();
+    setIsNarratedPreviewPlaying(false);
+    setSelectedClipId(clipId);
+  };
+
+  const handleCustomClipChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const clip = event.target.files?.[0] ?? null;
+    if (!clip) return;
+    if (!clip.type.startsWith("video/")) {
+      setError("Please choose an MP4, WebM, or another browser-supported video file.");
+      return;
+    }
+
+    previewVideoRef.current?.pause();
+    previewAudioRef.current?.pause();
+    setIsNarratedPreviewPlaying(false);
+    setCustomClipFile(clip);
+    setCustomClipUrl(URL.createObjectURL(clip));
+    setSelectedClipId("custom");
+  };
+
+  const toggleNarratedPreview = async () => {
+    const video = previewVideoRef.current;
+    const audio = previewAudioRef.current;
+    if (!video || !audio) return;
+
+    if (isNarratedPreviewPlaying) {
+      video.pause();
+      audio.pause();
+      setIsNarratedPreviewPlaying(false);
+      return;
+    }
+
+    try {
+      video.currentTime = 0;
+      audio.currentTime = 0;
+      await Promise.all([video.play(), audio.play()]);
+      setIsNarratedPreviewPlaying(true);
+    } catch (err) {
+      console.error(err);
+      setError("Your browser could not start the narrated preview. Use the audio controls below instead.");
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -236,6 +361,65 @@ const Create: React.FC = () => {
             </label>
           </div>
 
+          <fieldset className="grid gap-3">
+            <legend className="text-xs uppercase tracking-[0.3em] text-black/50">
+              Background clip
+            </legend>
+            <p className="text-sm text-black/60">
+              Choose the visual that will play with your generated voiceover.
+            </p>
+            <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+              {BRAINROT_CLIPS.map((clip) => {
+                const isSelected = clip.id === selectedClipId;
+                return (
+                  <button
+                    key={clip.id}
+                    type="button"
+                    aria-pressed={isSelected}
+                    onClick={() => selectClip(clip.id)}
+                    className={`overflow-hidden rounded-2xl border text-left transition focus:outline-none focus:ring-2 focus:ring-black/50 ${
+                      isSelected ? "border-black bg-black text-white shadow-md" : "border-black/15 bg-white/60 hover:border-black/50"
+                    }`}
+                  >
+                    <video
+                      src={clip.src}
+                      muted
+                      loop
+                      playsInline
+                      preload="metadata"
+                      className="aspect-[9/12] w-full bg-black object-cover"
+                    />
+                    <span className="block p-3">
+                      <span className="block text-sm font-semibold">{clip.title}</span>
+                      <span className={`mt-1 block text-xs leading-4 ${isSelected ? "text-white/70" : "text-black/55"}`}>
+                        {clip.description}
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+              <label
+                className={`flex min-h-44 cursor-pointer flex-col justify-between rounded-2xl border border-dashed p-3 transition ${
+                  selectedClipId === "custom" ? "border-black bg-black text-white" : "border-black/25 bg-white/60 hover:border-black/50"
+                }`}
+              >
+                <span className="text-2xl" aria-hidden="true">+</span>
+                <span>
+                  <span className="block text-sm font-semibold">Your clip</span>
+                  <span className={`mt-1 block text-xs leading-4 ${selectedClipId === "custom" ? "text-white/70" : "text-black/55"}`}>
+                    {customClipFile ? customClipFile.name : "Upload gameplay or a video you have rights to use."}
+                  </span>
+                </span>
+                <input
+                  type="file"
+                  accept="video/mp4,video/webm,video/quicktime"
+                  onChange={handleCustomClipChange}
+                  className="sr-only"
+                />
+              </label>
+            </div>
+          </fieldset>
+
           <div className="flex flex-wrap items-center gap-3">
             <button
               type="submit"
@@ -274,6 +458,60 @@ const Create: React.FC = () => {
                 </p>
               )}
             </div>
+            <div className="overflow-hidden rounded-2xl border border-black/10 bg-black">
+              <video
+                key={selectedClip.id}
+                ref={previewVideoRef}
+                src={selectedClip.src}
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                className="aspect-[9/16] max-h-[28rem] w-full object-cover"
+                onPause={() => setIsNarratedPreviewPlaying(false)}
+              />
+              <div className="flex flex-wrap items-center justify-between gap-3 bg-white p-4 text-black">
+                <div>
+                  <p className="text-sm font-semibold">{selectedClip.title}</p>
+                  <p className="text-xs text-black/55">Selected background clip</p>
+                </div>
+                {audioSrc ? (
+                  <button
+                    type="button"
+                    onClick={toggleNarratedPreview}
+                    className="rounded-full bg-black px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white"
+                  >
+                    {isNarratedPreviewPlaying ? "Pause preview" : "Play with voice"}
+                  </button>
+                ) : (
+                  <p className="text-xs text-black/55">Generate narration to preview the pairing.</p>
+                )}
+              </div>
+              {selectedClip.sourceUrl ? (
+                <a
+                  href={selectedClip.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block bg-black px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.18em] text-white/75 transition hover:text-white"
+                >
+                  Clip source & license
+                </a>
+              ) : (
+                <p className="bg-black px-4 py-3 text-center text-xs text-white/70">
+                  Use only clips you own or are licensed to reuse.
+                </p>
+              )}
+            </div>
+            {audioSrc && (
+              <audio
+                ref={previewAudioRef}
+                src={audioSrc}
+                onEnded={() => {
+                  previewVideoRef.current?.pause();
+                  setIsNarratedPreviewPlaying(false);
+                }}
+              />
+            )}
           </div>
         </div>
       </div>

@@ -31,8 +31,8 @@ OUTPUT RULES — READ CAREFULLY
 Output ONLY the script text. Nothing else.
 Do NOT label sections. Do NOT write headings. Do NOT mention the topic name as a title.
 Do NOT add commentary, metadata, or formatting outside the script.
-Minimum 200 words.
-Maximum 4 emojis total across the entire script.
+maximim 200 words.
+No emojis at all.
 No JSON. No bullet points. No lists.
 
 TONE RULES

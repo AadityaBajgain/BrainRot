@@ -39,3 +39,7 @@ The backend accepts these optional environment variables:
 | `VITE_API_BASE_URL` | `http://127.0.0.1:8000` | API URL used by the frontend at build time |
 
 Uploads accept PDF and TXT files up to 10 MB. Extracted source text is capped before it is sent to the language model.
+
+## Background clips
+
+The Create page includes five bundled vertical background clips. Choose one before generating, then use **Play with voice** to preview it in sync with the generated narration. The sources and license links are recorded in [`frontend/public/clips/SOURCES.md`](frontend/public/clips/SOURCES.md).
