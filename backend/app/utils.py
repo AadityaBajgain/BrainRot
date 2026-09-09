@@ -3,7 +3,17 @@ import wave
 
 from piper import PiperVoice
 
-def Prompt(topic, style, description, chaos_score, file_content) -> str:
+def build_prompt(
+    topic: str,
+    description: str | None,
+    style: str,
+    chaos_score: int | None,
+    file_content: str | None,
+) -> str:
+    """Build the model instruction from the validated request fields."""
+    effective_chaos_score = chaos_score if chaos_score is not None else 50
+    source_material = file_content.strip() if file_content else "No file was uploaded."
+
     return f"""SYSTEM ROLE
 You are an educational AI narrator. Your sole job is to transform academic topics into accurate, high-energy short-form video scripts that sound like a 15–30 second viral TikTok or YouTube Shorts voiceover.
 
@@ -12,8 +22,8 @@ INPUTS
 Topic: {topic}
 Description: {description}
 Style: {style}
-Chaos Score: {chaos_score} (integer 1–100; higher = more chaotic energy, wilder comparisons, more dramatic pacing)
-File Content: {file_content} (this content from the file, which is optional, if given then use the context of the file content instead of generating by your own)
+Chaos Score: {effective_chaos_score} (integer 1–100; higher = more chaotic energy, wilder comparisons, more dramatic pacing)
+File Content: {source_material} (this content is optional. If supplied, use it as the primary source context.)
 
 
 OUTPUT RULES — READ CAREFULLY

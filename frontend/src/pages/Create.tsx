@@ -8,6 +8,8 @@ interface ReqBody {
   file?: File;
 }
 
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000").replace(/\/$/, "");
+
 const Create: React.FC = () => {
   const [res, setRes] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
@@ -48,6 +50,7 @@ const Create: React.FC = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+    setAudioSrc("");
 
     if (!reqBody.topic.trim()) {
       setError("Please add a topic to generate.");
@@ -71,21 +74,22 @@ const Create: React.FC = () => {
         formData.append("file", file);
       }
 
-      const response = await fetch("http://127.0.0.1:8000/generate", {
+      const response = await fetch(`${API_BASE_URL}/generate`, {
         method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error(`Request Failed: ${response.status}`);
+        const errorBody = await response.json().catch(() => null);
+        throw new Error(errorBody?.detail ?? `Request failed (${response.status}).`);
       }
 
       const data = await response.json();
       setRes(data.response ?? "");
-      setAudioSrc(data.audio_url ?? "");
+      setAudioSrc(data.audio_url ? new URL(data.audio_url, API_BASE_URL).toString() : "");
     } catch (err) {
       console.error(err);
-      setError(`Error: ${err}`);
+      setError(err instanceof Error ? err.message : "Something went wrong while generating your study script.");
     } finally {
       setIsLoading(false);
     }
@@ -255,7 +259,7 @@ const Create: React.FC = () => {
             <p className="text-xs uppercase tracking-[0.3em] text-black/50">
               Generated Output
             </p>
-            <div className="max-h-64 overflow-auto rounded-2xl border border-black/10 bg-white p-4 text-sm text-black/80">
+            <div className="max-h-64 overflow-auto rounded-2xl border border-black/10 bg-white p-4 text-sm leading-6 text-black/80 whitespace-pre-wrap">
               {res || "Your brainrot summary will appear here."}
             </div>
             <div className="rounded-2xl border border-black/10 bg-white p-4">

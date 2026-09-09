@@ -2,14 +2,21 @@
 @import "tailwindcss";
 
 :root {
-  @apply max-w-[70vw] m-auto mt-5;
+  min-height: 100%;
 }
 
 body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
   font-family: "Space Grotesk", ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", sans-serif;
-  background: #ffffff;
   color: #2c1010;
+}
+
+#root {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 1.25rem auto 0;
 }
 
 @keyframes fadeUp {
