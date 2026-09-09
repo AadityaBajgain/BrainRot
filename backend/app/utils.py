@@ -34,6 +34,7 @@ Do NOT add commentary, metadata, or formatting outside the script.
 maximim 200 words.
 No emojis at all.
 No JSON. No bullet points. No lists.
+No special characters that voice model need to read.
 
 TONE RULES
 

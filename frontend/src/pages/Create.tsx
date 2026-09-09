@@ -12,45 +12,22 @@ const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:800
 
 const BRAINROT_CLIPS = [
   {
-    id: "slime",
-    title: "Slime Scoop",
-    description: "Oddly satisfying, bright, and impossible to ignore.",
-    src: "/clips/slime.mp4",
-    sourceUrl: "https://mixkit.co/free-stock-video/slippery-slime-in-the-hands-of-a-woman-who-plays-47343/",
-  },
-  {
-    id: "plasticine",
-    title: "Plasticine Loop",
-    description: "Soft, colorful motion for a calmer background.",
-    src: "/clips/plasticine.mp4",
-    sourceUrl: "https://mixkit.co/free-stock-video/showing-yellow-plasticine-in-the-shape-of-ice-cream-48181/",
-  },
-  {
-    id: "dominoes",
-    title: "Domino Chain",
-    description: "A quick cause-and-effect visual with real momentum.",
-    src: "/clips/dominoes.mp4",
-    sourceUrl: "https://mixkit.co/free-stock-video/domino-effect-on-dark-background-5253/",
-  },
-  {
-    id: "neon-bokeh",
-    title: "Neon Bokeh",
-    description: "High-energy color without distracting from the voiceover.",
-    src: "/clips/neon-bokeh.mp4",
-    sourceUrl: "https://mixkit.co/free-stock-video/vertical-video-of-colorful-bokeh-lights-on-black-background-99842/",
-  },
-  {
-    id: "brain-spiral",
-    title: "Brain Spiral",
-    description: "The full chaotic-study-mode option.",
-    src: "/clips/brain-spiral.mp4",
-    sourceUrl: "https://mixkit.co/free-stock-video/dynamic-animation-of-the-head-of-a-screaming-man-32645/",
-  },
-  {
     id:"TungTung",
     title:"Tung Tung Sahur",
     description:"...",
     src:"/clips/TungTung.mp4",
+  },
+  {
+    id:"subway",
+    title:"subway surfer gameplay",
+    description:"...",
+    src:"/clips/Subway.mp4",
+  },
+  {
+    id:"Minecraft",
+    title:"Minecraft gameplay",
+    description:"...",
+    src:"/clips/Minecraft.mp4"
   }
 ] as const;
 
@@ -71,7 +48,7 @@ const Create: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [audioSrc, setAudioSrc] = useState<string>("");
-  const [selectedClipId, setSelectedClipId] = useState<ClipId>("slime");
+  const [selectedClipId, setSelectedClipId] = useState<ClipId>("TungTung");
   const [customClipFile, setCustomClipFile] = useState<File | null>(null);
   const [customClipUrl, setCustomClipUrl] = useState<string | null>(null);
   const [isNarratedPreviewPlaying, setIsNarratedPreviewPlaying] = useState(false);
@@ -167,7 +144,7 @@ const Create: React.FC = () => {
     setSelectedFile(null);
     setAudioSrc("");
     setIsNarratedPreviewPlaying(false);
-    setSelectedClipId("slime");
+    setSelectedClipId("TungTung");
     setCustomClipFile(null);
     setCustomClipUrl(null);
   };

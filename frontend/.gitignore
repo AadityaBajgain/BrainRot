@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 dist
+clips
 dist-ssr
 *.local
 
@@ -23,4 +24,3 @@ dist-ssr
 *.sln
 *.sw?
 
-public/clips/
